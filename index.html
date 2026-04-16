@@ -39,7 +39,6 @@
 
   <div id="output"></div>
 
-  <!-- Handlebars Template -->
   <script id="table-template" type="text/x-handlebars-template">
     <table>
       <tr>
@@ -65,15 +64,11 @@
         .then(response => response.json())
         .then(data => {
 
-          // Filter by major
           let filtered = data.filter(student => student.major === majorType);
-
-          // Compile Handlebars template
           let source = document.getElementById("table-template").innerHTML;
           let template = Handlebars.compile(source);
-
-          // Insert into page
           let html = template({ students: filtered });
+          
           document.getElementById("output").innerHTML = html;
         })
         .catch(error => console.log("Error loading JSON:", error));
