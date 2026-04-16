@@ -1,56 +1,84 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>CIT 140 Program 5</title>
+  <title>Program 5</title>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+  <!-- Handlebars CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+    }
+
+    table {
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+    }
+
+    button {
+      margin-right: 10px;
+      padding: 5px 10px;
+    }
+  </style>
 </head>
 
 <body>
 
-<h2>Student Filter</h2>
+  <h2>Select a Major</h2>
 
-<button onclick="showData('CIT')">CIT Majors</button>
-<button onclick="showData('BUS')">Business Majors</button>
+  <button onclick="loadData('CIT')">CIT Majors</button>
+  <button onclick="loadData('BUS')">Business Majors</button>
 
-<div id="result"></div>
+  <p>We filter our dataset by major</p>
 
-<!-- Handlebars template -->
-<script id="template" type="text/x-handlebars-template">
-  <table border="1">
-    <tr>
-      <th>Name</th>
-      <th>Major</th>
-      <th>Midterm</th>
-      <th>Final</th>
-    </tr>
+  <div id="output"></div>
 
-    {{#each rows}}
-    <tr>
-      <td>{{name}}</td>
-      <td>{{major}}</td>
-      <td>{{midterm}}</td>
-      <td>{{final}}</td>
-    </tr>
-    {{/each}}
+  <!-- Handlebars Template -->
+  <script id="table-template" type="text/x-handlebars-template">
+    <table>
+      <tr>
+        <th>Name</th>
+        <th>Major</th>
+        <th>Midterm</th>
+        <th>Final</th>
+      </tr>
+      {{#each students}}
+      <tr>
+        <td>{{name}}</td>
+        <td>{{major}}</td>
+        <td>{{midterm}}</td>
+        <td>{{final}}</td>
+      </tr>
+      {{/each}}
+    </table>
+  </script>
 
-  </table>
-</script>
+  <script>
+    function loadData(majorType) {
+      fetch('cit5students.json')
+        .then(response => response.json())
+        .then(data => {
 
-<script>
-async function showData(major) {
-  let response = await fetch("cit5students.json");
-  let data = await response.json();
+          // Filter by major
+          let filtered = data.filter(student => student.major === majorType);
 
-  let filtered = data.filter(s => s.major === major);
+          // Compile Handlebars template
+          let source = document.getElementById("table-template").innerHTML;
+          let template = Handlebars.compile(source);
 
-  let source = document.getElementById("template").innerHTML;
-  let template = Handlebars.compile(source);
-  let html = template({ rows: filtered });
-
-  document.getElementById("result").innerHTML = html;
-}
-</script>
+          // Insert into page
+          let html = template({ students: filtered });
+          document.getElementById("output").innerHTML = html;
+        })
+        .catch(error => console.log("Error loading JSON:", error));
+    }
+  </script>
 
 </body>
 </html>
